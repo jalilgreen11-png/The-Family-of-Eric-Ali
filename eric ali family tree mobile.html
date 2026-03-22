@@ -1,0 +1,556 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#f5f3ef;
+  --bg2:#edeae3;
+  --bg3:#e0dbd0;
+  --line:#b0a888;
+  --shadow:0 1px 6px rgba(0,0,0,0.07);
+  --shadow-h:0 4px 16px rgba(0,0,0,0.12);
+  --r:8px;
+}
+
+html,body{background:var(--bg);font-family:'Source Sans 3',sans-serif;}
+
+.wrap{background:var(--bg);padding:20px 14px 48px;min-height:100%;}
+
+/* HEADER */
+.hdr{text-align:center;margin-bottom:20px;}
+.hdr h1{font-family:'Lora',serif;font-size:20px;font-weight:600;color:#2a2318;}
+.hdr p{font-size:12px;color:#9a8e78;margin-top:3px;}
+.hdr-rule{width:120px;height:1px;background:linear-gradient(90deg,transparent,#b0a880,transparent);margin:8px auto 0;}
+
+/* STATS */
+.stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+.stat{background:#fff;border:1px solid var(--bg3);border-radius:var(--r);padding:7px 14px;text-align:center;box-shadow:var(--shadow);}
+.stat-n{display:block;font-family:'Lora',serif;font-size:17px;font-weight:600;color:#2a2318;}
+.stat-l{display:block;font-size:10px;color:#9a9080;margin-top:1px;}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:22px;}
+.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:#7a7060;}
+.ld{width:10px;height:10px;border-radius:2px;border:1px solid;}
+
+/* ── SECTION BLOCKS ── */
+.section{margin-bottom:28px;}
+.section-head{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  border-radius:var(--r);
+  margin-bottom:14px;
+  cursor:pointer;
+  user-select:none;
+}
+.section-head .s-title{font-size:14px;font-weight:600;}
+.section-head .s-sub{font-size:11px;opacity:.7;margin-top:1px;}
+.section-head .chevron{margin-left:auto;font-size:13px;transition:transform .2s;}
+.section-head.collapsed .chevron{transform:rotate(-90deg);}
+.section-body{display:block;}
+.section-body.hidden{display:none;}
+
+/* PATRIARCH */
+.patriarch-block{background:#2c3e2d;border:1.5px solid #4a6b4c;border-radius:var(--r);padding:14px;margin-bottom:28px;cursor:pointer;box-shadow:var(--shadow);}
+.patriarch-block:hover{box-shadow:var(--shadow-h);}
+.pb-inner{display:flex;align-items:center;gap:12px;}
+.pb-av{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#c8e0ca;flex-shrink:0;font-family:'Lora',serif;}
+.pb-name{font-family:'Lora',serif;font-size:17px;font-weight:600;color:#e0f0e2;}
+.pb-sub{font-size:11px;color:rgba(224,240,226,0.65);margin-top:2px;}
+
+/* WIFE HEADER */
+.wife-head{background:#3d3020;border:1px solid #6b5530;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.wife-head:hover{box-shadow:var(--shadow-h);}
+.w-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#d4b87a;flex-shrink:0;font-family:'Lora',serif;}
+.w-name{font-size:14px;font-weight:600;color:#f0e6d0;}
+.w-sub{font-size:11px;color:rgba(240,230,208,0.6);margin-top:1px;}
+.w-chev{margin-left:auto;color:rgba(212,184,122,0.6);font-size:13px;transition:transform .2s;}
+.wife-section.collapsed .w-chev{transform:rotate(-90deg);}
+
+/* CHILD CARD */
+.child-wrap{margin-bottom:10px;border-radius:var(--r);overflow:hidden;border:1px solid var(--bg3);box-shadow:var(--shadow);}
+.child-head{background:#fff;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.child-head:hover{background:#faf8f4;}
+.ch-av{width:34px;height:34px;border-radius:50%;background:#f2ede4;border:1px solid #d8d0bc;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#5a4a28;flex-shrink:0;font-family:'Lora',serif;}
+.ch-name{font-size:13px;font-weight:600;color:#2a2318;}
+.ch-sub{font-size:10.5px;color:#8a7858;margin-top:1px;}
+.ch-chev{margin-left:auto;color:#c0b898;font-size:12px;transition:transform .2s;flex-shrink:0;}
+.child-wrap.expanded .ch-chev{transform:rotate(90deg);}
+
+/* GRANDCHILD PANEL */
+.gc-panel{background:var(--bg2);border-top:1px solid var(--bg3);padding:10px 12px;display:none;}
+.child-wrap.expanded .gc-panel{display:block;}
+.gc-title{font-size:9.5px;font-weight:600;letter-spacing:.07em;color:#9a9080;margin-bottom:8px;}
+
+/* GC CARD */
+.gc-card{background:#fff;border:1px solid #c8ccd8;border-radius:6px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:6px;cursor:pointer;transition:box-shadow .15s;}
+.gc-card:hover{box-shadow:var(--shadow-h);}
+.gc-av{width:30px;height:30px;border-radius:50%;background:#eef0f7;border:1px solid #c0c8e0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#2a3560;flex-shrink:0;font-family:'Lora',serif;}
+.gc-name{font-size:12px;font-weight:600;color:#1e2535;}
+.gc-sub{font-size:10px;color:#6070a0;margin-top:1px;}
+
+/* GGC LIST */
+.ggc-list{margin:4px 0 6px 14px;padding-left:10px;border-left:2px solid var(--bg3);}
+.ggc-item{background:#f8f7f4;border:1px dashed #d0ccc0;border-radius:5px;padding:6px 10px;display:flex;align-items:center;gap:7px;margin-bottom:4px;cursor:pointer;transition:box-shadow .15s;}
+.ggc-item:hover{box-shadow:var(--shadow-h);}
+.ggc-av{width:24px;height:24px;border-radius:50%;background:#f0ede8;border:1px solid #d0ccc0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#6a6050;flex-shrink:0;font-family:'Lora',serif;}
+.ggc-name{font-size:11px;font-weight:500;color:#5a5448;}
+
+/* POPOVER TOAST — slides up from bottom, no overlay */
+.toast{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;
+  border-top:1px solid var(--bg3);
+  border-radius:16px 16px 0 0;
+  padding:16px 18px 24px;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.12);
+  z-index:999;
+  transform:translateY(100%);
+  transition:transform .25s ease;
+  font-family:'Source Sans 3',sans-serif;
+  max-height:60vh;
+  overflow-y:auto;
+}
+.toast.open{transform:translateY(0);}
+.toast-handle{width:36px;height:4px;background:#d8d4cc;border-radius:2px;margin:0 auto 14px;}
+.toast-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin:0 auto 8px;border:1.5px solid rgba(0,0,0,0.08);font-family:'Lora',serif;}
+.toast-name{font-family:'Lora',serif;font-size:16px;font-weight:600;color:#1e1a12;text-align:center;}
+.toast-role{font-size:11px;color:#9a9080;text-align:center;margin-top:2px;margin-bottom:12px;}
+.toast-divider{height:1px;background:var(--bg3);margin:10px 0;}
+.toast-row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;font-size:12px;border-bottom:1px solid #f0ece4;}
+.toast-row:last-child{border-bottom:none;}
+.toast-lbl{color:#9a9080;flex-shrink:0;}
+.toast-val{color:#2a2318;font-weight:500;text-align:right;}
+.toast-close{position:absolute;top:14px;right:16px;background:var(--bg2);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;color:#7a7060;display:flex;align-items:center;justify-content:center;}
+
+/* DESKTOP: wider layout with side-by-side columns */
+@media(min-width:768px){
+  .wrap{padding:28px 24px 48px;}
+  .two-col{display:flex;gap:20px;align-items:flex-start;}
+  .two-col > div{flex:1;min-width:0;}
+  .hdr h1{font-size:24px;}
+}
+</style>
+
+<!-- TOAST PANEL -->
+<div class="toast" id="toast">
+  <button class="toast-close" onclick="closeToast()">×</button>
+  <div class="toast-handle"></div>
+  <div class="toast-av" id="t-av"></div>
+  <div class="toast-name" id="t-name"></div>
+  <div class="toast-role" id="t-role"></div>
+  <div class="toast-divider"></div>
+  <div id="t-rows"></div>
+</div>
+<div id="toast-bg" onclick="closeToast()" style="display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,0.18);"></div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <h1>Family of Eric Ali</h1>
+  <p>Four Generations &nbsp;·&nbsp; بسم الله الرحمن الرحيم</p>
+  <div class="hdr-rule"></div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><span class="stat-n">2</span><span class="stat-l">Wives</span></div>
+  <div class="stat"><span class="stat-n">18</span><span class="stat-l">Children</span></div>
+  <div class="stat"><span class="stat-n">34</span><span class="stat-l">Grandchildren</span></div>
+  <div class="stat"><span class="stat-n">8</span><span class="stat-l">Great-grandchildren</span></div>
+  <div class="stat"><span class="stat-n">4</span><span class="stat-l">Generations</span></div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg"><div class="ld" style="background:#2c3e2d;border-color:#4a6b4c;"></div>Patriarch</div>
+  <div class="leg"><div class="ld" style="background:#3d3020;border-color:#6b5530;"></div>Wife</div>
+  <div class="leg"><div class="ld" style="background:#fff;border-color:#c0b89a;"></div>Children</div>
+  <div class="leg"><div class="ld" style="background:#fff;border-color:#c8ccd8;"></div>Grandchildren</div>
+  <div class="leg"><div class="ld" style="background:#f8f7f4;border-color:#d0ccc0;border-style:dashed;"></div>Great-grandchildren</div>
+  <span style="font-size:10px;color:#b0a890;margin-left:4px;">tap any card for details</span>
+</div>
+
+<!-- PATRIARCH -->
+<div class="patriarch-block" onclick="showToast('Eric Ali','Patriarch','EA','p',[['Wives','Rose Querals · Halla'],['Children (total)','18'],['By Wife 1','11'],['By Wife 2','7'],['Grandchildren','34'],['Great-grandchildren','8']])">
+  <div class="pb-inner">
+    <div class="pb-av">EA</div>
+    <div>
+      <div class="pb-name">Eric Ali</div>
+      <div class="pb-sub">Patriarch · 2 wives · 18 children</div>
+    </div>
+    <div style="margin-left:auto;color:rgba(200,224,202,0.4);font-size:13px;">›</div>
+  </div>
+</div>
+
+<!-- TWO WIFE COLUMNS -->
+<div class="two-col">
+
+  <!-- ══ WIFE 1 ══ -->
+  <div class="wife-section" id="ws1">
+    <div class="wife-head" onclick="toggleWife('ws1')">
+      <div class="w-av">RQ</div>
+      <div>
+        <div class="w-name">Rose Querals</div>
+        <div class="w-sub">Wife #1 · 11 children</div>
+      </div>
+      <span class="w-chev">›</span>
+    </div>
+    <div class="wife-body">
+
+      <!-- children of wife 1 -->
+      <!-- C1 Ayisha -->
+      <div class="child-wrap" id="cw-aa">
+        <div class="child-head" onclick="toggleChild('cw-aa','AA','Ayisha Ali','Child #1 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Omar Ryan'],['Children','9'],['Names','Taharah, Aliyya, Mumina, Raihana, Aadila, Omar, Erica, Ali, Rose']])">
+          <div class="ch-av">AA</div>
+          <div><div class="ch-name">Ayisha Ali</div><div class="ch-sub">× Omar Ryan · 9 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 9</div>
+          <div class="gc-card" onclick="showToast('Taharah Ryan','Grandchild · Ayisha Ali','TR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Adam Mubarak'],['Children','3'],['Names','Ridwan, Rayhana, Nusaybah']])">
+            <div class="gc-av">TR</div><div><div class="gc-name">Taharah Ryan</div><div class="gc-sub">× Adam Mubarak · 3 children</div></div>
+          </div>
+          <div class="ggc-list">
+            <div class="ggc-item" onclick="showToast('Ridwan Mubarak','Great-grandchild','RM','ggc',[['Parents','Taharah Ryan & Adam Mubarak'],['Great-grandparent','Eric Ali']])"><div class="ggc-av">RM</div><div class="ggc-name">Ridwan Mubarak</div></div>
+            <div class="ggc-item" onclick="showToast('Rayhana Mubarak','Great-grandchild','RaM','ggc',[['Parents','Taharah Ryan & Adam Mubarak'],['Great-grandparent','Eric Ali']])"><div class="ggc-av">RaM</div><div class="ggc-name">Rayhana Mubarak</div></div>
+            <div class="ggc-item" onclick="showToast('Nusaybah Mubarak','Great-grandchild','NM','ggc',[['Parents','Taharah Ryan & Adam Mubarak'],['Great-grandparent','Eric Ali']])"><div class="ggc-av">NM</div><div class="ggc-name">Nusaybah Mubarak</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Aliyya Ryan','Grandchild · Ayisha Ali','AlR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Sheikh Jah'],['Children','4'],['Names','Mamarem, Abdulmuhaymin, Muhmmadon, Abdulqadir']])">
+            <div class="gc-av">AlR</div><div><div class="gc-name">Aliyya Ryan</div><div class="gc-sub">× Sheikh Jah · 4 children</div></div>
+          </div>
+          <div class="ggc-list">
+            <div class="ggc-item" onclick="showToast('Mamarem Jah','Great-grandchild','MaJ','ggc',[['Parents','Aliyya Ryan & Sheikh Jah']])"><div class="ggc-av">MaJ</div><div class="ggc-name">Mamarem Jah</div></div>
+            <div class="ggc-item" onclick="showToast('Abdulmuhaymin Jah','Great-grandchild','AmJ','ggc',[['Parents','Aliyya Ryan & Sheikh Jah']])"><div class="ggc-av">AmJ</div><div class="ggc-name">Abdulmuhaymin Jah</div></div>
+            <div class="ggc-item" onclick="showToast('Muhmmadon Jah','Great-grandchild','MhJ','ggc',[['Parents','Aliyya Ryan & Sheikh Jah']])"><div class="ggc-av">MhJ</div><div class="ggc-name">Muhmmadon Jah</div></div>
+            <div class="ggc-item" onclick="showToast('Abdulqadir Jah','Great-grandchild','AqJ','ggc',[['Parents','Aliyya Ryan & Sheikh Jah']])"><div class="ggc-av">AqJ</div><div class="ggc-name">Abdulqadir Jah</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Mumina Ryan','Grandchild · Ayisha Ali','MuR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Mam bubu Jah'],['Children','1'],['Names','Maryam Jah']])">
+            <div class="gc-av">MuR</div><div><div class="gc-name">Mumina Ryan</div><div class="gc-sub">× Mam bubu Jah · 1 child</div></div>
+          </div>
+          <div class="ggc-list">
+            <div class="ggc-item" onclick="showToast('Maryam Jah','Great-grandchild','MyJ','ggc',[['Parents','Mumina Ryan & Mam bubu Jah']])"><div class="ggc-av">MyJ</div><div class="ggc-name">Maryam Jah</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Raihana Ryan','Grandchild · Ayisha Ali','RaR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','—'],['Children','0']])">
+            <div class="gc-av">RaR</div><div><div class="gc-name">Raihana Ryan</div><div class="gc-sub">no spouse listed</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Aadila Ryan','Grandchild · Ayisha Ali','AdR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Jalil Green'],['Children','—']])">
+            <div class="gc-av">AdR</div><div><div class="gc-name">Aadila Ryan</div><div class="gc-sub">× Jalil Green</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Omar Ryan','Grandchild · Ayisha Ali','OR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan Sr.']])">
+            <div class="gc-av">OR</div><div><div class="gc-name">Omar Ryan</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Erica Ryan','Grandchild · Ayisha Ali','ER','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan']])">
+            <div class="gc-av">ER</div><div><div class="gc-name">Erica Ryan</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Ali Ryan','Grandchild · Ayisha Ali','AlRy','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan']])">
+            <div class="gc-av">AlRy</div><div><div class="gc-name">Ali Ryan</div></div>
+          </div>
+          <div class="gc-card" onclick="showToast('Rose Ryan','Grandchild · Ayisha Ali','RoR','gc',[['Mother','Ayisha Ali'],['Father','Omar Ryan']])">
+            <div class="gc-av">RoR</div><div><div class="gc-name">Rose Ryan</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- C2 Ahmed -->
+      <div class="child-wrap" id="cw-aha">
+        <div class="child-head" onclick="toggleChild('cw-aha','AhA','Ahmed Ali','Child #2 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Hijrah Ryan'],['Children','4'],['Names','Abdulqadir, Abdulkareem, Zackariya, Abdulraheem']])">
+          <div class="ch-av">AhA</div>
+          <div><div class="ch-name">Ahmed Ali</div><div class="ch-sub">× Hijrah Ryan · 4 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 4</div>
+          <div class="gc-card" onclick="showToast('Abdulqadir Ali','Grandchild · Ahmed Ali','AqA','gc',[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']])"><div class="gc-av">AqA</div><div><div class="gc-name">Abdulqadir Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Abdulkareem Ali','Grandchild · Ahmed Ali','AkA','gc',[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']])"><div class="gc-av">AkA</div><div><div class="gc-name">Abdulkareem Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Zackariya Ali','Grandchild · Ahmed Ali','ZA','gc',[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']])"><div class="gc-av">ZA</div><div><div class="gc-name">Zackariya Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Abdulraheem Ali','Grandchild · Ahmed Ali','ArA','gc',[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']])"><div class="gc-av">ArA</div><div><div class="gc-name">Abdulraheem Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- C3 Saleh -->
+      <div class="child-wrap" id="cw-sa">
+        <div class="child-head" onclick="toggleChild('cw-sa','SA','Saleh Ali','Child #3 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Asma Salam'],['Children','3'],['Names','Safawan, Maytha, Ayleen']])">
+          <div class="ch-av">SA</div>
+          <div><div class="ch-name">Saleh Ali</div><div class="ch-sub">× Asma Salam · 3 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 3</div>
+          <div class="gc-card" onclick="showToast('Safawan Ali','Grandchild · Saleh Ali','SfA','gc',[['Father','Saleh Ali'],['Mother','Asma Salam']])"><div class="gc-av">SfA</div><div><div class="gc-name">Safawan Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Maytha Ali','Grandchild · Saleh Ali','MaA','gc',[['Father','Saleh Ali'],['Mother','Asma Salam']])"><div class="gc-av">MaA</div><div><div class="gc-name">Maytha Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Ayleen Ali','Grandchild · Saleh Ali','AyA','gc',[['Father','Saleh Ali'],['Mother','Asma Salam']])"><div class="gc-av">AyA</div><div><div class="gc-name">Ayleen Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- C4 Abdurahman -->
+      <div class="child-wrap" id="cw-aba">
+        <div class="child-head" onclick="toggleChild('cw-aba','AbA','Abdurahman Ali','Child #4 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Amina Abdulmalik'],['Children','5'],['Names','Ibrahim, Maryam, Musa, Muhammad, Ahmed']])">
+          <div class="ch-av">AbA</div>
+          <div><div class="ch-name">Abdurahman Ali</div><div class="ch-sub">× Amina Abdulmalik · 5 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 5</div>
+          <div class="gc-card" onclick="showToast('Ibrahim Ali','Grandchild · Abdurahman Ali','IbA','gc',[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']])"><div class="gc-av">IbA</div><div><div class="gc-name">Ibrahim Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Maryam Ali','Grandchild · Abdurahman Ali','MyA','gc',[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']])"><div class="gc-av">MyA</div><div><div class="gc-name">Maryam Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Musa Ali','Grandchild · Abdurahman Ali','MsA','gc',[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']])"><div class="gc-av">MsA</div><div><div class="gc-name">Musa Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Muhammad Ali','Grandchild · Abdurahman Ali','MhAb','gc',[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']])"><div class="gc-av">MhAb</div><div><div class="gc-name">Muhammad Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Ahmed Ali','Grandchild · Abdurahman Ali','AhAb','gc',[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']])"><div class="gc-av">AhAb</div><div><div class="gc-name">Ahmed Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- C5 Qasim -->
+      <div class="child-wrap" id="cw-qa">
+        <div class="child-head" onclick="toggleChild('cw-qa','QA','Qasim Ali','Child #5 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Sarah Naji'],['Children','2'],['Names','Zara, Prince']])">
+          <div class="ch-av">QA</div>
+          <div><div class="ch-name">Qasim Ali</div><div class="ch-sub">× Sarah Naji · 2 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 2</div>
+          <div class="gc-card" onclick="showToast('Zara Ali','Grandchild · Qasim Ali','ZaA','gc',[['Father','Qasim Ali'],['Mother','Sarah Naji']])"><div class="gc-av">ZaA</div><div><div class="gc-name">Zara Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Prince Ali','Grandchild · Qasim Ali','PrA','gc',[['Father','Qasim Ali'],['Mother','Sarah Naji']])"><div class="gc-av">PrA</div><div><div class="gc-name">Prince Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- C6 Maryam (no spouse) -->
+      <div class="child-wrap" id="cw-mya">
+        <div class="child-head" onclick="showToast('Maryam Ali','Child #6 · Rose Querals','MyAli','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']])">
+          <div class="ch-av">MyA</div>
+          <div><div class="ch-name">Maryam Ali</div><div class="ch-sub">no spouse listed</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+      <!-- C7 Muhammad Ali -->
+      <div class="child-wrap" id="cw-mha">
+        <div class="child-head" onclick="toggleChild('cw-mha','MhA','Muhammad Ali','Child #7 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Chaimae Fakhy'],['Children','1'],['Names','Sultan']])">
+          <div class="ch-av">MhA</div>
+          <div><div class="ch-name">Muhammad Ali</div><div class="ch-sub">× Chaimae Fakhy · 1 child</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 1</div>
+          <div class="gc-card" onclick="showToast('Sultan Ali','Grandchild · Muhammad Ali','StA','gc',[['Father','Muhammad Ali'],['Mother','Chaimae Fakhy']])"><div class="gc-av">StA</div><div><div class="gc-name">Sultan Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- C8 Yusuf -->
+      <div class="child-wrap" id="cw-ya">
+        <div class="child-head" onclick="showToast('Yusuf Ali','Child #8 · Rose Querals','YA','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']])">
+          <div class="ch-av">YA</div>
+          <div><div class="ch-name">Yusuf Ali</div><div class="ch-sub">no spouse listed</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+      <!-- C9 Khalid -->
+      <div class="child-wrap" id="cw-kha">
+        <div class="child-head" onclick="showToast('Khalid Ali','Child #9 · Rose Querals','KhA','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']])">
+          <div class="ch-av">KhA</div>
+          <div><div class="ch-name">Khalid Ali</div><div class="ch-sub">no spouse listed</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+      <!-- C10 Khadijah -->
+      <div class="child-wrap" id="cw-kda">
+        <div class="child-head" onclick="toggleChild('cw-kda','KdA','Khadijah Ali','Child #10 · Rose Querals','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Abdurahman Zaid'],['Children','2'],['Names','Abdulhameed, Suhayb']])">
+          <div class="ch-av">KdA</div>
+          <div><div class="ch-name">Khadijah Ali</div><div class="ch-sub">× Abdurahman Zaid · 2 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 2</div>
+          <div class="gc-card" onclick="showToast('Abdulhameed Zaid','Grandchild · Khadijah Ali','AhZ','gc',[['Father','Abdurahman Zaid'],['Mother','Khadijah Ali']])"><div class="gc-av">AhZ</div><div><div class="gc-name">Abdulhameed Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Suhayb Zaid','Grandchild · Khadijah Ali','SuZ','gc',[['Father','Abdurahman Zaid'],['Mother','Khadijah Ali']])"><div class="gc-av">SuZ</div><div><div class="gc-name">Suhayb Zaid</div></div></div>
+        </div>
+      </div>
+
+      <!-- C11 Ismail -->
+      <div class="child-wrap" id="cw-isa">
+        <div class="child-head" onclick="showToast('Ismail Ali','Child #11 · Rose Querals','IsA','ch',[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']])">
+          <div class="ch-av">IsA</div>
+          <div><div class="ch-name">Ismail Ali</div><div class="ch-sub">no spouse listed</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+    </div><!-- wife-body -->
+  </div><!-- ws1 -->
+
+  <!-- ══ WIFE 2 ══ -->
+  <div class="wife-section" id="ws2">
+    <div class="wife-head" onclick="toggleWife('ws2')">
+      <div class="w-av">Ha</div>
+      <div>
+        <div class="w-name">Halla</div>
+        <div class="w-sub">Wife #2 · 7 children</div>
+      </div>
+      <span class="w-chev">›</span>
+    </div>
+    <div class="wife-body">
+
+      <!-- W2 C1 Shurooq -->
+      <div class="child-wrap" id="cw-sha">
+        <div class="child-head" onclick="toggleChild('cw-sha','ShA','Shurooq Ali','Child #1 · Halla','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Mustafa Zaid'],['Children','7'],['Names','Tariq, Khairi, Jabir, Abdulhakeem, Muhammad, Ali, Abdurahman']])">
+          <div class="ch-av">ShA</div>
+          <div><div class="ch-name">Shurooq Ali</div><div class="ch-sub">× Mustafa Zaid · 7 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 7</div>
+          <div class="gc-card" onclick="showToast('Tariq Zaid','Grandchild · Shurooq Ali','TZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">TZ</div><div><div class="gc-name">Tariq Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Khairi Zaid','Grandchild · Shurooq Ali','KhZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">KhZ</div><div><div class="gc-name">Khairi Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Jabir Zaid','Grandchild · Shurooq Ali','JaZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">JaZ</div><div><div class="gc-name">Jabir Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Abdulhakeem Zaid','Grandchild · Shurooq Ali','AhkZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">AhkZ</div><div><div class="gc-name">Abdulhakeem Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Muhammad Zaid','Grandchild · Shurooq Ali','MhZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">MhZ</div><div><div class="gc-name">Muhammad Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Ali Zaid','Grandchild · Shurooq Ali','AlZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">AlZ</div><div><div class="gc-name">Ali Zaid</div></div></div>
+          <div class="gc-card" onclick="showToast('Abdurahman Zaid','Grandchild · Shurooq Ali','ArZ','gc',[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']])"><div class="gc-av">ArZ</div><div><div class="gc-name">Abdurahman Zaid</div></div></div>
+        </div>
+      </div>
+
+      <!-- W2 C2 Muaath -->
+      <div class="child-wrap" id="cw-mua">
+        <div class="child-head" onclick="toggleChild('cw-mua','MuA','Muaath Ali','Child #2 · Halla','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Madhath'],['Children','2'],['Names','Ayyub, Asiya']])">
+          <div class="ch-av">MuA</div>
+          <div><div class="ch-name">Muaath Ali</div><div class="ch-sub">× Madhath · 2 children</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 2</div>
+          <div class="gc-card" onclick="showToast('Ayyub Ali','Grandchild · Muaath Ali','AyAli','gc',[['Father','Muaath Ali'],['Mother','Madhath']])"><div class="gc-av">AyAli</div><div><div class="gc-name">Ayyub Ali</div></div></div>
+          <div class="gc-card" onclick="showToast('Asiya Ali','Grandchild · Muaath Ali','AsA','gc',[['Father','Muaath Ali'],['Mother','Madhath']])"><div class="gc-av">AsA</div><div><div class="gc-name">Asiya Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- W2 C3 Musab -->
+      <div class="child-wrap" id="cw-msab">
+        <div class="child-head" onclick="toggleChild('cw-msab','MsAb','Musab Ali','Child #3 · Halla','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Nora'],['Children','1'],['Names','Rowan']])">
+          <div class="ch-av">MsAb</div>
+          <div><div class="ch-name">Musab Ali</div><div class="ch-sub">× Nora · 1 child</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 1</div>
+          <div class="gc-card" onclick="showToast('Rowan Ali','Grandchild · Musab Ali','RwA','gc',[['Father','Musab Ali'],['Mother','Nora']])"><div class="gc-av">RwA</div><div><div class="gc-name">Rowan Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- W2 C4 Abdullah -->
+      <div class="child-wrap" id="cw-abda">
+        <div class="child-head" onclick="toggleChild('cw-abda','AbdA','Abdullah Ali','Child #4 · Halla','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Toulaye'],['Children','1'],['Names','Talha']])">
+          <div class="ch-av">AbdA</div>
+          <div><div class="ch-name">Abdullah Ali</div><div class="ch-sub">× Toulaye · 1 child</div></div>
+          <span class="ch-chev">›</span>
+        </div>
+        <div class="gc-panel">
+          <div class="gc-title">GRANDCHILDREN · 1</div>
+          <div class="gc-card" onclick="showToast('Talha Ali','Grandchild · Abdullah Ali','TlA','gc',[['Father','Abdullah Ali'],['Mother','Toulaye']])"><div class="gc-av">TlA</div><div><div class="gc-name">Talha Ali</div></div></div>
+        </div>
+      </div>
+
+      <!-- W2 C5 Fatima -->
+      <div class="child-wrap" id="cw-faa">
+        <div class="child-head" onclick="showToast('Fatima Ali','Child #5 · Halla','FaA','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Jose'],['Children','0 listed']])">
+          <div class="ch-av">FaA</div>
+          <div><div class="ch-name">Fatima Ali</div><div class="ch-sub">× Jose</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+      <!-- W2 C6 Ranya -->
+      <div class="child-wrap" id="cw-raa">
+        <div class="child-head" onclick="showToast('Ranya Ali','Child #6 · Halla','RaA','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','—'],['Children','0']])">
+          <div class="ch-av">RaA</div>
+          <div><div class="ch-name">Ranya Ali</div><div class="ch-sub">no spouse listed</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+      <!-- W2 C7 Zubair -->
+      <div class="child-wrap" id="cw-zua">
+        <div class="child-head" onclick="showToast('Zubair Ali','Child #7 · Halla','ZuA','ch',[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Anesa Abdullah'],['Children','0 listed']])">
+          <div class="ch-av">ZuA</div>
+          <div><div class="ch-name">Zubair Ali</div><div class="ch-sub">× Anesa Abdullah</div></div>
+          <span class="ch-chev" style="opacity:.3;">›</span>
+        </div>
+      </div>
+
+    </div><!-- wife-body -->
+  </div><!-- ws2 -->
+
+</div><!-- two-col -->
+
+<!-- FOOTER -->
+<div style="text-align:center;margin-top:32px;padding-top:14px;border-top:1px solid var(--bg3);">
+  <div style="font-size:12px;color:#b0a890;font-family:'Lora',serif;font-style:italic;">رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي</div>
+  <div style="font-size:10px;color:#c0b8a0;margin-top:3px;">"My Lord, make me an establisher of prayer, and from my descendants" — Ibrahim 14:40</div>
+</div>
+
+</div><!-- wrap -->
+
+<script>
+/* ── TOAST ── */
+var toast = document.getElementById('toast');
+var toastBg = document.getElementById('toast-bg');
+
+var avStyles = {
+  p:   {bg:'#2c3e2d', color:'#b8d4ba'},
+  w:   {bg:'#3d3020', color:'#d4b87a'},
+  ch:  {bg:'#f2ede4', color:'#5a4a28'},
+  gc:  {bg:'#eef0f7', color:'#2a3560'},
+  ggc: {bg:'#f0ede8', color:'#6a6050'}
+};
+
+function showToast(name, role, initials, type, rows) {
+  var s = avStyles[type] || avStyles.gc;
+  var av = document.getElementById('t-av');
+  av.style.background = s.bg;
+  av.style.color = s.color;
+  av.textContent = initials;
+  document.getElementById('t-name').textContent = name;
+  document.getElementById('t-role').textContent = role;
+  var html = '';
+  rows.forEach(function(r){ html += '<div class="toast-row"><span class="toast-lbl">'+r[0]+'</span><span class="toast-val">'+r[1]+'</span></div>'; });
+  document.getElementById('t-rows').innerHTML = html;
+  toast.classList.add('open');
+  toastBg.style.display = 'block';
+}
+function closeToast() {
+  toast.classList.remove('open');
+  toastBg.style.display = 'none';
+}
+
+/* ── TOGGLE CHILD ACCORDION ── */
+function toggleChild(id, initials, name, role, type, rows) {
+  var el = document.getElementById(id);
+  var isExpanded = el.classList.contains('expanded');
+  if (isExpanded) {
+    el.classList.remove('expanded');
+  } else {
+    el.classList.add('expanded');
+  }
+}
+
+/* ── TOGGLE WIFE SECTION ── */
+function toggleWife(id) {
+  var el = document.getElementById(id);
+  var body = el.querySelector('.wife-body');
+  var chev = el.querySelector('.w-chev');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    chev.style.transform = '';
+  } else {
+    body.style.display = 'none';
+    chev.style.transform = 'rotate(-90deg)';
+  }
+}
+
+/* children cards without GC panel — clicking shows toast directly */
+/* (already wired via onclick on child-head to showToast directly) */
+</script>
