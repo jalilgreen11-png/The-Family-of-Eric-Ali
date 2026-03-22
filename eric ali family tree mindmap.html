@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Family of Eric Ali</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+3:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:#f0ede6;touch-action:none;font-family:'Source Sans 3',sans-serif;}
+
+#canvas{position:absolute;inset:0;overflow:hidden;background:#f0ede6;cursor:grab;}
+#canvas:active{cursor:grabbing;}
+#world{position:absolute;transform-origin:0 0;will-change:transform;}
+#lines-svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;}
+
+/* dot grid */
+#canvas::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,#c0bcb2 1px,transparent 1px);
+  background-size:28px 28px;opacity:.5;pointer-events:none;z-index:0;
+}
+
+/* NODE CARDS */
+.node{
+  position:absolute;border-radius:10px;
+  padding:10px 12px 9px;cursor:pointer;
+  user-select:none;touch-action:none;
+  transition:box-shadow .15s;text-align:center;border:1.5px solid;
+}
+.node:active{box-shadow:0 6px 20px rgba(0,0,0,0.18);}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;margin:0 auto 6px;border:1.5px solid rgba(0,0,0,0.1);font-family:'Lora',serif;}
+.nn{font-size:11.5px;font-weight:600;line-height:1.3;}
+.ns{font-size:10px;margin-top:2px;line-height:1.3;opacity:.7;}
+
+.n-p{background:#2c3e2d;border-color:#4a6b4c;box-shadow:0 3px 14px rgba(44,62,45,0.35);}
+.n-p .av{background:rgba(255,255,255,0.15);color:#c8e4ca;}
+.n-p .nn{color:#e0f0e2;}.n-p .ns{color:#c8e4ca;}
+
+.n-w{background:#3d3020;border-color:#6b5530;box-shadow:0 2px 10px rgba(61,48,32,0.28);}
+.n-w .av{background:rgba(255,255,255,0.1);color:#d4b87a;}
+.n-w .nn{color:#f0e6d0;}.n-w .ns{color:#d4b87a;}
+
+.n-ch{background:#fff;border-color:#c0b89a;box-shadow:0 2px 8px rgba(0,0,0,0.09);}
+.n-ch .av{background:#f2ede4;color:#5a4a28;}
+.n-ch .nn{color:#2a2318;}.n-ch .ns{color:#7a6a48;}
+
+.n-gc{background:#fff;border-color:#b8c4d8;box-shadow:0 1px 6px rgba(0,0,0,0.07);}
+.n-gc .av{background:#eef0f7;color:#2a3560;}
+.n-gc .nn{color:#1e2535;}.n-gc .ns{color:#5a6080;}
+
+.n-ggc{background:#faf9f6;border-color:#d0ccc0;border-style:dashed;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.n-ggc .av{background:#f0ede8;color:#6a6050;width:26px;height:26px;font-size:8px;}
+.n-ggc .nn{color:#5a5448;font-size:10.5px;}
+
+/* TOP BAR */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:#2c3e2d;
+  border-bottom:2px solid #3d5e40;
+  padding:14px 18px 13px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.18);
+}
+#topbar h1{font-family:'Lora',serif;font-size:19px;font-weight:600;color:#d8eeda;letter-spacing:.02em;}
+#topbar p{font-size:11px;color:rgba(200,228,202,0.65);margin-top:3px;}
+.hint{font-size:11px;color:rgba(200,228,202,0.7);background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:5px 13px;white-space:nowrap;flex-shrink:0;}
+
+/* CONTROLS */
+#controls{position:fixed;bottom:20px;right:14px;display:flex;flex-direction:column;gap:8px;z-index:100;}
+.cbtn{
+  width:42px;height:42px;border-radius:50%;
+  background:#fff;border:1px solid #d8d4cc;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  color:#5a5448;
+}
+.cbtn:active{background:#f5f3ef;}
+
+/* MINI LEGEND */
+#legend{
+  position:fixed;top:72px;left:0;right:0;z-index:99;
+  display:flex;gap:10px;flex-wrap:wrap;
+  padding:8px 18px;
+  background:rgba(240,237,230,0.95);backdrop-filter:blur(6px);
+  border-bottom:1px solid #ddd8ce;
+}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:#6a6050;}
+.ld{width:10px;height:10px;border-radius:2px;border:1px solid;}
+
+/* DETAIL SHEET */
+#sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:#fff;border-top:1px solid #e0dbd0;
+  border-radius:18px 18px 0 0;
+  padding:14px 18px 32px;
+  transform:translateY(100%);
+  transition:transform .26s cubic-bezier(.32,.72,0,1);
+  max-height:58vh;overflow-y:auto;
+  box-shadow:0 -6px 28px rgba(0,0,0,0.12);
+}
+#sheet.open{transform:translateY(0);}
+.sh{width:36px;height:4px;background:#d8d4cc;border-radius:2px;margin:0 auto 14px;}
+.st{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.s-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;font-family:'Lora',serif;border:1.5px solid rgba(0,0,0,0.08);}
+.s-name{font-family:'Lora',serif;font-size:16px;font-weight:600;color:#1e1a12;}
+.s-role{font-size:11px;color:#9a9080;margin-top:2px;}
+.s-x{margin-left:auto;background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;padding:4px;flex-shrink:0;}
+.sdiv{height:1px;background:#f0ece4;margin:10px 0;}
+.srow{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:12px;border-bottom:1px solid #f8f5f0;}
+.srow:last-child{border:none;}
+.sl{color:#9a9080;flex-shrink:0;}
+.sv{color:#2a2318;font-weight:500;text-align:right;}
+#shdim{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.15);}
+
+/* STATS BAR */
+#statsbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:90;
+  display:flex;justify-content:center;gap:10px;padding:8px 14px 10px;
+  background:rgba(240,237,230,0.9);backdrop-filter:blur(8px);
+  border-top:1px solid #ddd8ce;
+}
+.st-pill{text-align:center;}
+.st-n{display:block;font-family:'Lora',serif;font-size:15px;font-weight:600;color:#2a2318;}
+.st-l{display:block;font-size:9px;color:#9a9080;}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div><h1>Family of Eric Ali</h1><p>بسم الله الرحمن الرحيم · 4 generations</p></div>
+  <div class="hint">drag · pinch · tap</div>
+</div>
+
+<div id="legend">
+  <div class="leg"><div class="ld" style="background:#2c3e2d;border-color:#4a6b4c;"></div>Patriarch</div>
+  <div class="leg"><div class="ld" style="background:#3d3020;border-color:#6b5530;"></div>Wife</div>
+  <div class="leg"><div class="ld" style="background:#fff;border-color:#c0b89a;"></div>Children</div>
+  <div class="leg"><div class="ld" style="background:#fff;border-color:#b8c4d8;"></div>Grandchildren</div>
+  <div class="leg"><div class="ld" style="background:#faf9f6;border-color:#d0ccc0;border-style:dashed;"></div>Great-grandchildren</div>
+</div>
+
+<div id="canvas">
+  <div id="world">
+    <svg id="lines-svg"></svg>
+  </div>
+</div>
+
+<div id="controls">
+  <button class="cbtn" onclick="zoom(1.3)">+</button>
+  <button class="cbtn" onclick="zoom(0.77)">−</button>
+  <button class="cbtn" onclick="resetView()" style="font-size:14px;">⌂</button>
+</div>
+
+<div id="statsbar">
+  <div class="st-pill"><span class="st-n">2</span><span class="st-l">Wives</span></div>
+  <div class="st-pill"><span class="st-n">18</span><span class="st-l">Children</span></div>
+  <div class="st-pill"><span class="st-n">34</span><span class="st-l">Grandchildren</span></div>
+  <div class="st-pill"><span class="st-n">8</span><span class="st-l">Great-grandchildren</span></div>
+</div>
+
+<div id="sheet">
+  <div class="sh"></div>
+  <div class="st">
+    <div class="s-av" id="s-av"></div>
+    <div><div class="s-name" id="s-name"></div><div class="s-role" id="s-role"></div></div>
+    <button class="s-x" onclick="closeSheet()">×</button>
+  </div>
+  <div class="sdiv"></div>
+  <div id="s-rows"></div>
+</div>
+<div id="shdim" onclick="closeSheet()"></div>
+
+<script>
+/* ══════════════════════════════════
+   ALL NODES
+══════════════════════════════════ */
+var NODES = [
+  {id:'EA',  type:'p',   initials:'EA',   name:'Eric Ali',          sub:'Patriarch · 2 wives · 18 children', parent:null,
+   det:[['Wives','Rose Querals · Halla'],['Children','18 total'],['By Wife 1','11'],['By Wife 2','7'],['Grandchildren','34'],['Great-grandchildren','8']]},
+
+  {id:'RQ',  type:'w',   initials:'RQ',   name:'Rose Querals',      sub:'Wife #1 · 11 children', parent:'EA',
+   det:[['Husband','Eric Ali'],['Children','11'],['Names','Ayisha, Ahmed, Saleh, Abdurahman, Qasim, Maryam, Muhammad, Yusuf, Khalid, Khadijah, Ismail']]},
+  {id:'Ha',  type:'w',   initials:'Ha',   name:'Halla',             sub:'Wife #2 · 7 children',  parent:'EA',
+   det:[['Husband','Eric Ali'],['Children','7'],['Names','Shurooq, Muaath, Musab, Abdullah, Fatima, Ranya, Zubair']]},
+
+  /* Wife 1 children */
+  {id:'AA',    type:'ch', initials:'AA',   name:'Ayisha Ali',        sub:'× Omar Ryan · 9 children', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Omar Ryan'],['Children','9'],['Names','Taharah, Aliyya, Mumina, Raihana, Aadila, Omar, Erica, Ali, Rose']]},
+  {id:'AhA',   type:'ch', initials:'AhA',  name:'Ahmed Ali',         sub:'× Hijrah Ryan · 4 children', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Hijrah Ryan'],['Children','4'],['Names','Abdulqadir, Abdulkareem, Zackariya, Abdulraheem']]},
+  {id:'SA',    type:'ch', initials:'SA',   name:'Saleh Ali',         sub:'× Asma Salam · 3 children', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Asma Salam'],['Children','3'],['Names','Safawan, Maytha, Ayleen']]},
+  {id:'AbA',   type:'ch', initials:'AbA',  name:'Abdurahman Ali',    sub:'× Amina Abdulmalik · 5', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Amina Abdulmalik'],['Children','5'],['Names','Ibrahim, Maryam, Musa, Muhammad, Ahmed']]},
+  {id:'QA',    type:'ch', initials:'QA',   name:'Qasim Ali',         sub:'× Sarah Naji · 2 children', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Sarah Naji'],['Children','2'],['Names','Zara, Prince']]},
+  {id:'MyAli', type:'ch', initials:'MyA',  name:'Maryam Ali',        sub:'no spouse listed', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']]},
+  {id:'MhAli', type:'ch', initials:'MhA',  name:'Muhammad Ali',      sub:'× Chaimae Fakhy · 1', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Chaimae Fakhy'],['Children','1'],['Names','Sultan']]},
+  {id:'YA',    type:'ch', initials:'YA',   name:'Yusuf Ali',         sub:'no spouse listed', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']]},
+  {id:'KhA',   type:'ch', initials:'KhA',  name:'Khalid Ali',        sub:'no spouse listed', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']]},
+  {id:'KdA',   type:'ch', initials:'KdA',  name:'Khadijah Ali',      sub:'× Abdurahman Zaid · 2', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','Abdurahman Zaid'],['Children','2'],['Names','Abdulhameed, Suhayb']]},
+  {id:'IsA',   type:'ch', initials:'IsA',  name:'Ismail Ali',        sub:'no spouse listed', parent:'RQ',
+   det:[['Father','Eric Ali'],['Mother','Rose Querals'],['Spouse','—'],['Children','0']]},
+
+  /* Wife 2 children */
+  {id:'ShA',  type:'ch', initials:'ShA',  name:'Shurooq Ali',   sub:'× Mustafa Zaid · 7', parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Mustafa Zaid'],['Children','7'],['Names','Tariq, Khairi, Jabir, Abdulhakeem, Muhammad, Ali, Abdurahman']]},
+  {id:'MuA',  type:'ch', initials:'MuA',  name:'Muaath Ali',    sub:'× Madhath · 2',       parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Madhath'],['Children','2'],['Names','Ayyub, Asiya']]},
+  {id:'MsAb', type:'ch', initials:'MsAb', name:'Musab Ali',     sub:'× Nora · 1',          parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Nora'],['Children','1'],['Names','Rowan']]},
+  {id:'AbdA', type:'ch', initials:'AbdA', name:'Abdullah Ali',  sub:'× Toulaye · 1',       parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Toulaye'],['Children','1'],['Names','Talha']]},
+  {id:'FaA',  type:'ch', initials:'FaA',  name:'Fatima Ali',    sub:'× Julio',              parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Julio'],['Children','0 listed']]},
+  {id:'RaA',  type:'ch', initials:'RaA',  name:'Ranya Ali',     sub:'no spouse',           parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','—'],['Children','0']]},
+  {id:'ZuA',  type:'ch', initials:'ZuA',  name:'Zubair Ali',    sub:'× Anesa Abdullah',    parent:'Ha',
+   det:[['Father','Eric Ali'],['Mother','Halla'],['Spouse','Anesa Abdullah'],['Children','0 listed']]},
+
+  /* Grandchildren of Ayisha */
+  {id:'TR',   type:'gc', initials:'TR',   name:'Taharah Ryan',    sub:'× Adam Mubarak · 3', parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Adam Mubarak'],['Children','3'],['Names','Ridwan, Rayhana, Nusaybah']]},
+  {id:'AlR',  type:'gc', initials:'AlR',  name:'Aliyya Ryan',     sub:'× Sheikh Jah · 4',   parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Sheikh Jah'],['Children','4'],['Names','Mamarem, Abdulmuhaymin, Muhmmadon, Abdulqadir']]},
+  {id:'MuR',  type:'gc', initials:'MuR',  name:'Mumina Ryan',     sub:'× Mam bubu Jah · 1', parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Mam bubu Jah'],['Children','1'],['Names','Maryam Jah']]},
+  {id:'RaR',  type:'gc', initials:'RaR',  name:'Raihana Ryan',    sub:'no spouse',           parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan']]},
+  {id:'AdR',  type:'gc', initials:'AdR',  name:'Aadila Ryan',     sub:'× Jalil Green',       parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan'],['Spouse','Jalil Green']]},
+  {id:'ORy',  type:'gc', initials:'OR',   name:'Omar Ryan',       sub:'',                    parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan']]},
+  {id:'ERy',  type:'gc', initials:'ER',   name:'Erica Ryan',      sub:'',                    parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan']]},
+  {id:'AlRy', type:'gc', initials:'AlRy', name:'Ali Ryan',        sub:'',                    parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan']]},
+  {id:'RoR',  type:'gc', initials:'RoR',  name:'Rose Ryan',       sub:'',                    parent:'AA',
+   det:[['Mother','Ayisha Ali'],['Father','Omar Ryan']]},
+
+  /* Grandchildren of Ahmed */
+  {id:'AqA',  type:'gc', initials:'AqA',  name:'Abdulqadir Ali',  sub:'', parent:'AhA', det:[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']]},
+  {id:'AkA',  type:'gc', initials:'AkA',  name:'Abdulkareem Ali', sub:'', parent:'AhA', det:[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']]},
+  {id:'ZA',   type:'gc', initials:'ZA',   name:'Zackariya Ali',   sub:'', parent:'AhA', det:[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']]},
+  {id:'ArA',  type:'gc', initials:'ArA',  name:'Abdulraheem Ali', sub:'', parent:'AhA', det:[['Father','Ahmed Ali'],['Mother','Hijrah Ryan']]},
+
+  /* Grandchildren of Saleh */
+  {id:'SfA',  type:'gc', initials:'SfA',  name:'Safawan Ali', sub:'', parent:'SA', det:[['Father','Saleh Ali'],['Mother','Asma Salam']]},
+  {id:'MaA',  type:'gc', initials:'MaA',  name:'Maytha Ali',  sub:'', parent:'SA', det:[['Father','Saleh Ali'],['Mother','Asma Salam']]},
+  {id:'AyA',  type:'gc', initials:'AyA',  name:'Ayleen Ali',  sub:'', parent:'SA', det:[['Father','Saleh Ali'],['Mother','Asma Salam']]},
+
+  /* Grandchildren of Abdurahman */
+  {id:'IbA',  type:'gc', initials:'IbA',  name:'Ibrahim Ali',   sub:'', parent:'AbA', det:[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']]},
+  {id:'MyA2', type:'gc', initials:'MyA',  name:'Maryam Ali',    sub:'', parent:'AbA', det:[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']]},
+  {id:'MsA',  type:'gc', initials:'MsA',  name:'Musa Ali',      sub:'', parent:'AbA', det:[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']]},
+  {id:'MhAb', type:'gc', initials:'MhAb', name:'Muhammad Ali',  sub:'', parent:'AbA', det:[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']]},
+  {id:'AhAb', type:'gc', initials:'AhAb', name:'Ahmed Ali',     sub:'', parent:'AbA', det:[['Father','Abdurahman Ali'],['Mother','Amina Abdulmalik']]},
+
+  /* Grandchildren of Qasim */
+  {id:'ZaA',  type:'gc', initials:'ZaA',  name:'Zara Ali',   sub:'', parent:'QA', det:[['Father','Qasim Ali'],['Mother','Sarah Naji']]},
+  {id:'PrA',  type:'gc', initials:'PrA',  name:'Prince Ali', sub:'', parent:'QA', det:[['Father','Qasim Ali'],['Mother','Sarah Naji']]},
+
+  /* Grandchildren of Muhammad Ali */
+  {id:'StA',  type:'gc', initials:'StA',  name:'Sultan Ali', sub:'', parent:'MhAli', det:[['Father','Muhammad Ali'],['Mother','Chaimae Fakhy']]},
+
+  /* Grandchildren of Khadijah */
+  {id:'AhZ',  type:'gc', initials:'AhZ',  name:'Abdulhameed Zaid', sub:'', parent:'KdA', det:[['Father','Abdurahman Zaid'],['Mother','Khadijah Ali']]},
+  {id:'SuZ',  type:'gc', initials:'SuZ',  name:'Suhayb Zaid',      sub:'', parent:'KdA', det:[['Father','Abdurahman Zaid'],['Mother','Khadijah Ali']]},
+
+  /* Grandchildren of Shurooq */
+  {id:'TZ',   type:'gc', initials:'TZ',   name:'Tariq Zaid',       sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+  {id:'KhZ',  type:'gc', initials:'KhZ',  name:'Khairi Zaid',      sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+  {id:'JaZ',  type:'gc', initials:'JaZ',  name:'Jabir Zaid',       sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+  {id:'AhkZ', type:'gc', initials:'AhkZ', name:'Abdulhakeem Zaid', sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+  {id:'MhZ',  type:'gc', initials:'MhZ',  name:'Muhammad Zaid',    sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+  {id:'AlZ',  type:'gc', initials:'AlZ',  name:'Ali Zaid',         sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+  {id:'ArZ',  type:'gc', initials:'ArZ',  name:'Abdurahman Zaid',  sub:'', parent:'ShA', det:[['Father','Mustafa Zaid'],['Mother','Shurooq Ali']]},
+
+  /* Grandchildren of Muaath */
+  {id:'AyAli',type:'gc', initials:'AyA',  name:'Ayyub Ali', sub:'', parent:'MuA', det:[['Father','Muaath Ali'],['Mother','Madhath']]},
+  {id:'AsA',  type:'gc', initials:'AsA',  name:'Asiya Ali', sub:'', parent:'MuA', det:[['Father','Muaath Ali'],['Mother','Madhath']]},
+
+  /* Grandchild of Musab */
+  {id:'RwA',  type:'gc', initials:'RwA',  name:'Rowan Ali', sub:'', parent:'MsAb', det:[['Father','Musab Ali'],['Mother','Nora']]},
+
+  /* Grandchild of Abdullah */
+  {id:'TlA',  type:'gc', initials:'TlA',  name:'Talha Ali', sub:'', parent:'AbdA', det:[['Father','Abdullah Ali'],['Mother','Toulaye']]},
+
+  /* Great-grandchildren of Taharah */
+  {id:'RM',   type:'ggc', initials:'RM',  name:'Ridwan Mubarak',   sub:'', parent:'TR',  det:[['Parents','Taharah Ryan & Adam Mubarak'],['Great-grandparent','Eric Ali']]},
+  {id:'RaM',  type:'ggc', initials:'RaM', name:'Rayhana Mubarak',  sub:'', parent:'TR',  det:[['Parents','Taharah Ryan & Adam Mubarak'],['Great-grandparent','Eric Ali']]},
+  {id:'NM',   type:'ggc', initials:'NM',  name:'Nusaybah Mubarak', sub:'', parent:'TR',  det:[['Parents','Taharah Ryan & Adam Mubarak'],['Great-grandparent','Eric Ali']]},
+
+  /* Great-grandchildren of Aliyya */
+  {id:'MaJ',  type:'ggc', initials:'MaJ', name:'Mamarem Jah',       sub:'', parent:'AlR', det:[['Parents','Aliyya Ryan & Sheikh Jah']]},
+  {id:'AmJ',  type:'ggc', initials:'AmJ', name:'Abdulmuhaymin Jah', sub:'', parent:'AlR', det:[['Parents','Aliyya Ryan & Sheikh Jah']]},
+  {id:'MhJ',  type:'ggc', initials:'MhJ', name:'Muhmmadon Jah',     sub:'', parent:'AlR', det:[['Parents','Aliyya Ryan & Sheikh Jah']]},
+  {id:'AqJ',  type:'ggc', initials:'AqJ', name:'Abdulqadir Jah',    sub:'', parent:'AlR', det:[['Parents','Aliyya Ryan & Sheikh Jah']]},
+
+  /* Great-grandchild of Mumina */
+  {id:'MyJ',  type:'ggc', initials:'MyJ', name:'Maryam Jah', sub:'', parent:'MuR', det:[['Parents','Mumina Ryan & Mam bubu Jah']]},
+];
+
+/* ══════════════════════════════════
+   LAYOUT
+══════════════════════════════════ */
+var NW=152, NH=90, GW=120, GH=72, GAP=16;
+var GEN_Y={p:80, w:240, ch:430, gc:630, ggc:830};
+
+var nodeMap={};
+NODES.forEach(function(n){nodeMap[n.id]=n;});
+
+var childrenOf={};
+NODES.forEach(function(n){
+  if(n.parent){
+    if(!childrenOf[n.parent]) childrenOf[n.parent]=[];
+    childrenOf[n.parent].push(n.id);
+  }
+});
+
+function nw(n){return n.type==='ggc'?GW:NW;}
+function nh(n){return n.type==='ggc'?GH:NH;}
+
+function subtreeW(id){
+  var kids=childrenOf[id];
+  if(!kids||!kids.length) return nw(nodeMap[id]);
+  var tot=kids.reduce(function(s,k){return s+subtreeW(k);},0)+GAP*(kids.length-1);
+  return Math.max(nw(nodeMap[id]),tot);
+}
+
+function assignPos(id,cx){
+  var n=nodeMap[id];
+  n.cx=cx; n.x=cx-nw(n)/2; n.y=GEN_Y[n.type];
+  var kids=childrenOf[id];
+  if(!kids||!kids.length) return;
+  var tot=kids.reduce(function(s,k){return s+subtreeW(k);},0)+GAP*(kids.length-1);
+  var sx=cx-tot/2;
+  kids.forEach(function(k){
+    var sw=subtreeW(k);
+    assignPos(k,sx+sw/2);
+    sx+=sw+GAP;
+  });
+}
+
+var totalW=subtreeW('EA');
+assignPos('EA',totalW/2+40);
+
+/* ══════════════════════════════════
+   RENDER NODES
+══════════════════════════════════ */
+var world=document.getElementById('world');
+var svg=document.getElementById('lines-svg');
+
+NODES.forEach(function(n){
+  var d=document.createElement('div');
+  d.className='node n-'+n.type;
+  d.style.left=n.x+'px'; d.style.top=n.y+'px'; d.style.width=nw(n)+'px';
+  var as=n.type==='ggc'?26:36;
+  d.innerHTML='<div class="av" style="width:'+as+'px;height:'+as+'px;">'+n.initials+'</div>'+
+    '<div class="nn">'+n.name+'</div>'+
+    (n.sub?'<div class="ns">'+n.sub+'</div>':'');
+  d.addEventListener('click',function(e){e.stopPropagation();openSheet(n);});
+  d.addEventListener('touchend',function(e){
+    if(Math.abs(lastTouchDX)<6&&Math.abs(lastTouchDY)<6){e.preventDefault();e.stopPropagation();openSheet(n);}
+  });
+  world.appendChild(d);
+});
+
+/* ══════════════════════════════════
+   RENDER LINES
+══════════════════════════════════ */
+var maxX=0,maxY=0;
+NODES.forEach(function(n){maxX=Math.max(maxX,n.x+nw(n)+60);maxY=Math.max(maxY,n.y+nh(n)+60);});
+svg.setAttribute('width',maxX); svg.setAttribute('height',maxY);
+svg.style.width=maxX+'px'; svg.style.height=maxY+'px';
+
+/* Build orthogonal elbow connectors:
+   For siblings sharing a parent we draw:
+     1. A vertical from parent bottom down to a shared horizontal rail
+     2. A horizontal rail connecting all siblings at that mid-Y
+     3. A vertical drop from the rail down to each child top
+   This gives the classic neat family-tree look. */
+
+var paths = '';
+var lineColors = {w:'#7a6a4a', ch:'#9a8858', gc:'#7888b0', ggc:'#b0a898'};
+var lineWidths  = {w:'2',      ch:'2',       gc:'1.5',     ggc:'1'};
+
+/* Group children by parent so we can draw the shared horizontal rail */
+var byParent = {};
+NODES.forEach(function(n){
+  if(!n.parent) return;
+  if(!byParent[n.parent]) byParent[n.parent] = [];
+  byParent[n.parent].push(n);
+});
+
+Object.keys(byParent).forEach(function(pid){
+  var parent = nodeMap[pid];
+  if(!parent) return;
+  var kids = byParent[pid];
+
+  var px  = parent.cx;
+  var py  = parent.y + nh(parent);
+
+  /* rail Y = halfway between parent bottom and first child top */
+  var firstChildY = kids[0].y;
+  var railY = py + (firstChildY - py) * 0.5;
+
+  var col = lineColors[kids[0].type] || '#b0a898';
+  var lw  = lineWidths[kids[0].type] || '1.5';
+
+  /* vertical stem from parent down to rail */
+  paths += '<line x1="'+px+'" y1="'+py+'" x2="'+px+'" y2="'+railY+'" stroke="'+col+'" stroke-width="'+lw+'"/>';
+
+  if(kids.length === 1){
+    /* single child — just straight vertical, no horizontal needed */
+    var cy = kids[0].y;
+    var cx = kids[0].cx;
+    /* horizontal jog if child is not directly below parent */
+    if(Math.abs(cx - px) > 2){
+      paths += '<line x1="'+px+'" y1="'+railY+'" x2="'+cx+'" y2="'+railY+'" stroke="'+col+'" stroke-width="'+lw+'"/>';
+    }
+    paths += '<line x1="'+cx+'" y1="'+railY+'" x2="'+cx+'" y2="'+cy+'" stroke="'+col+'" stroke-width="'+lw+'"/>';
+  } else {
+    /* multiple children — horizontal rail spanning leftmost to rightmost */
+    var leftX  = kids.reduce(function(m,k){ return Math.min(m, k.cx); }, Infinity);
+    var rightX = kids.reduce(function(m,k){ return Math.max(m, k.cx); }, -Infinity);
+    paths += '<line x1="'+leftX+'" y1="'+railY+'" x2="'+rightX+'" y2="'+railY+'" stroke="'+col+'" stroke-width="'+lw+'"/>';
+
+    /* vertical drop from rail to each child */
+    kids.forEach(function(k){
+      paths += '<line x1="'+k.cx+'" y1="'+railY+'" x2="'+k.cx+'" y2="'+k.y+'" stroke="'+col+'" stroke-width="'+lw+'"/>';
+    });
+  }
+});
+
+svg.innerHTML = paths;
+
+/* ══════════════════════════════════
+   PAN & ZOOM
+══════════════════════════════════ */
+var tx=0,ty=0,scale=1,minS=0.12,maxS=2.8;
+var canvas=document.getElementById('canvas');
+
+function applyT(){world.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')';}
+
+function resetView(){
+  var cw=canvas.offsetWidth,ch=canvas.offsetHeight;
+  var eaN=nodeMap['EA'];
+  scale=Math.min(cw/(totalW+100),0.85);
+  tx=cw/2-eaN.cx*scale;
+  ty=90-GEN_Y.p*scale+10;
+  applyT();
+}
+window.addEventListener('load',function(){setTimeout(resetView,80);});
+setTimeout(resetView,120);
+
+function zoom(f){
+  var cw=canvas.offsetWidth,ch=canvas.offsetHeight;
+  var ns=Math.min(maxS,Math.max(minS,scale*f));
+  tx=cw/2-(cw/2-tx)*(ns/scale);
+  ty=ch/2-(ch/2-ty)*(ns/scale);
+  scale=ns; applyT();
+}
+
+/* Mouse */
+var dragging=false,lx=0,ly=0,moved=false;
+canvas.addEventListener('mousedown',function(e){if(e.target.closest('.node'))return;dragging=true;lx=e.clientX;ly=e.clientY;moved=false;});
+window.addEventListener('mousemove',function(e){if(!dragging)return;var dx=e.clientX-lx,dy=e.clientY-ly;if(Math.abs(dx)>3||Math.abs(dy)>3)moved=true;tx+=dx;ty+=dy;lx=e.clientX;ly=e.clientY;applyT();});
+window.addEventListener('mouseup',function(){dragging=false;});
+canvas.addEventListener('wheel',function(e){e.preventDefault();var f=e.deltaY<0?1.1:0.91;var r=canvas.getBoundingClientRect();var mx=e.clientX-r.left,my=e.clientY-r.top;var ns=Math.min(maxS,Math.max(minS,scale*f));tx=mx-(mx-tx)*(ns/scale);ty=my-(my-ty)*(ns/scale);scale=ns;applyT();},{passive:false});
+
+/* Touch */
+var touches={},pinchD=null,lastTouchDX=0,lastTouchDY=0,touchStartX=0,touchStartY=0;
+canvas.addEventListener('touchstart',function(e){
+  for(var i=0;i<e.changedTouches.length;i++){var t=e.changedTouches[i];touches[t.identifier]={x:t.clientX,y:t.clientY};}
+  var ts=Object.values(touches);
+  if(ts.length===2) pinchD=Math.hypot(ts[1].x-ts[0].x,ts[1].y-ts[0].y);
+  if(ts.length===1){touchStartX=ts[0].x;touchStartY=ts[0].y;lastTouchDX=0;lastTouchDY=0;}
+},{passive:true});
+
+canvas.addEventListener('touchmove',function(e){
+  e.preventDefault();
+  for(var i=0;i<e.changedTouches.length;i++){var t=e.changedTouches[i];if(touches[t.identifier])touches[t.identifier]={x:t.clientX,y:t.clientY};}
+  var ts=Object.values(touches);
+  if(ts.length===1){
+    var ot=touches[Object.keys(touches)[0]];
+    lastTouchDX=ts[0].x-touchStartX; lastTouchDY=ts[0].y-touchStartY;
+    tx+=ts[0].x-touchStartX-(lastTouchDX-(ts[0].x-touchStartX));
+  }
+  var ids=Object.keys(touches);
+  if(ids.length===1){
+    var prev=touches[ids[0]];
+    var cur=null;
+    for(var j=0;j<e.changedTouches.length;j++){if(e.changedTouches[j].identifier==ids[0])cur=e.changedTouches[j];}
+    if(!cur) return;
+    lastTouchDX=cur.clientX-touchStartX; lastTouchDY=cur.clientY-touchStartY;
+    tx+=cur.clientX-prev.x; ty+=cur.clientY-prev.y;
+    touches[ids[0]]={x:cur.clientX,y:cur.clientY};
+    applyT();
+  } else if(ids.length===2){
+    var nd=Math.hypot(ts[1].x-ts[0].x,ts[1].y-ts[0].y);
+    if(pinchD){
+      var f=nd/pinchD;
+      var mx=(ts[0].x+ts[1].x)/2,my=(ts[0].y+ts[1].y)/2;
+      var r=canvas.getBoundingClientRect(); mx-=r.left; my-=r.top;
+      var ns=Math.min(maxS,Math.max(minS,scale*f));
+      tx=mx-(mx-tx)*(ns/scale); ty=my-(my-ty)*(ns/scale);
+      scale=ns; applyT();
+    }
+    pinchD=nd;
+    // also pan with two fingers
+    var prevTs=ids.map(function(id){return touches[id];});
+    var midPrevX=(prevTs[0].x+prevTs[1].x)/2, midPrevY=(prevTs[0].y+prevTs[1].y)/2;
+    var midCurX=(ts[0].x+ts[1].x)/2,   midCurY=(ts[0].y+ts[1].y)/2;
+    tx+=midCurX-midPrevX; ty+=midCurY-midPrevY;
+    ids.forEach(function(id,i){touches[id]=ts[i]?{x:ts[i].x,y:ts[i].y}:touches[id];});
+    // update positions after pan+zoom
+    for(var k=0;k<e.changedTouches.length;k++){var tc=e.changedTouches[k];if(touches[tc.identifier])touches[tc.identifier]={x:tc.clientX,y:tc.clientY};}
+    applyT();
+  }
+},{passive:false});
+
+canvas.addEventListener('touchend',function(e){
+  for(var i=0;i<e.changedTouches.length;i++) delete touches[e.changedTouches[i].identifier];
+  if(Object.keys(touches).length<2) pinchD=null;
+},{passive:true});
+
+/* ══════════════════════════════════
+   DETAIL SHEET
+══════════════════════════════════ */
+var avSt={
+  p:  {bg:'#2c3e2d',c:'#b8d4ba'},
+  w:  {bg:'#3d3020',c:'#d4b87a'},
+  ch: {bg:'#f2ede4',c:'#5a4a28'},
+  gc: {bg:'#eef0f7',c:'#2a3560'},
+  ggc:{bg:'#f0ede8',c:'#6a6050'}
+};
+function openSheet(n){
+  var s=avSt[n.type]||avSt.gc;
+  var av=document.getElementById('s-av');
+  av.style.background=s.bg; av.style.color=s.c; av.textContent=n.initials;
+  document.getElementById('s-name').textContent=n.name;
+  document.getElementById('s-role').textContent=n.sub||'Family member';
+  var h=''; (n.det||[]).forEach(function(r){h+='<div class="srow"><span class="sl">'+r[0]+'</span><span class="sv">'+r[1]+'</span></div>';});
+  document.getElementById('s-rows').innerHTML=h;
+  document.getElementById('sheet').classList.add('open');
+  document.getElementById('shdim').style.display='block';
+}
+function closeSheet(){
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('shdim').style.display='none';
+}
+
+/* swipe down to close sheet */
+var sheetStartY=0;
+var sheet=document.getElementById('sheet');
+sheet.addEventListener('touchstart',function(e){sheetStartY=e.touches[0].clientY;},{passive:true});
+sheet.addEventListener('touchend',function(e){if(e.changedTouches[0].clientY-sheetStartY>60) closeSheet();},{passive:true});
+</script>
+</body>
+</html>
